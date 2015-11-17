@@ -1,0 +1,1 @@
+Extract the files onto the server directory and run 'form.php'

@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>dbconnect</title>
+</head>
+<body>
+<?php
+
+header( 'Content-Type: text/html; charset=utf-8' );
+include 'global.php';
+include 'global2.php';
+#include 'hindi.php';
+/*$hindi='नुपूर';
+print_r(mb_strlen($hindi,'UTF-8'));
+print_r(str_split_unicode($hindi,1));*/
+session_start();
+//open db connection
+
+$servername=$_SESSION['sname']=$_POST['sname'];
+$username=$_SESSION['uname']=$_POST['uname'];
+$password=$_SESSION['pass']=$_POST['pass'];
+$dbname=$_SESSION['dname']=$_POST['dname'];
+$tbname=$_SESSION['tname']=$_POST['tname'];
+
+
+
+
+try{
+    $dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password,
+    array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo 'connection established';
+  }
+
+  catch(PDOException $e){
+
+    echo "Connection failed: " . $e->getMessage();
+  }
+
+
+
+
+
+
+
+
+/*$str1='नुपुर';                                                                      //change string here
+$str1array=str_split_unicode($str1,1);
+$str2='नुपूर';                                                                        //change string here
+$str2array=str_split_unicode($str2,1);
+
+
+$result1=code($str1);
+$result2=code($str2);
+
+print_r('<br>'.$result1);
+print_r('<br>'.$result2);
+
+
+$stringmatch=similar_text($str1,$str2,$percent1);                                 //generates number of equal bits in string
+$codematch=similar_text($result1,$result2,$percent2);                             //generates number of equal bits in code
+*/
+
+
+$q = $dbh->prepare("DESCRIBE $tbname");                                            //query checking whether or not a column exists
+$q->execute();
+$table_fields = $q->fetchAll(PDO::FETCH_COLUMN);
+$check=in_array("newcolumn",$table_fields);
+
+if($check==FALSE){
+$sth1 = $dbh->prepare("ALTER TABLE $tbname ADD newcolumn VARCHAR( 255 ) after words");     //query adding a new column
+$sth1->execute();
+}
+
+$sth = $dbh->prepare("SELECT words FROM $tbname");                                 //query selecting names from array
+$sth->execute();
+$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+$count=$sth->rowCount();
+
+
+$newarray=array();
+for($i=0;$i<$count;$i++){                                                         //recursively calling function and storing
+$cgen=code($result[$i]['words']);                                                 //generated codes
+$newarray[]=$cgen;
+}
+
+
+for($i=0;$i<$count;$i++){
+  $sth2 = $dbh->prepare("UPDATE $tbname SET newcolumn = '$newarray[$i]' WHERE id=($i+1)");
+  $sth2->execute();
+}
+
+?>
+  <form action="result.php" method="get">
+<pre><p>enter the name u want to search: <input type="text" name="keyword" /></p>
+ <p><input type="submit" /></p></pre>
+</form>
+
+
+</body>
+</html>
