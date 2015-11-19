@@ -1,3 +1,7 @@
+<html>
+<body bgcolor="yellow">
+
+
 <?php
 
 header( 'Content-Type: text/html; charset=utf-8' );
@@ -26,9 +30,9 @@ try{
 
 $keyword=$_GET['keyword'];
 $codeofkeyword=code($keyword);
-echo '<pre>GENERATED CODE:    </pre>';
+echo '<br><br><br><pre><b><font face="arial" size=4>GENERATED CODE:    </font></b></pre>';
 print_r($codeofkeyword);
-echo '<br>';
+echo '<br><br>';
 
 
 $query=$dbh->prepare("SELECT * FROM $tbname");                                    //select all records from table
@@ -36,11 +40,11 @@ $query->execute();
 $result = $query->fetchAll();
 $count=$query->rowCount();
 
-echo '<pre>RESULT:   </pre>';                                                      //loop to find the word
+echo '<b><font face="arial" size=4>RESULT:    </font></b><br>';                                                      //loop to find the word
 $flag=0;
 for($i=0;$i<$count;$i++){
 if($result[$i]['newcolumn']==$codeofkeyword){
-print_r($result[$i]['id'].'&nbsp&nbsp'.$result[$i]['words'].'<br>');
+print_r('<br>'.$result[$i]['id'].'&nbsp&nbsp&nbsp&nbsp&nbsp'.$result[$i]['words'].'<br>');
 $flag++;
 }
 }
@@ -50,3 +54,6 @@ if($flag==0)
 
 
  ?>
+ </div>
+ </body>
+ </html>
